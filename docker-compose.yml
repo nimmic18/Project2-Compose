@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  dind:
+  dind: # docker in docker service
     image: docker:dind
     user: root
     privileged: true
@@ -12,7 +12,7 @@ services:
     environment:
       DOCKER_TLS_CERTDIR: ""
 
-  jenkins:
+  jenkins: # jenkins service
     image: jenkins/jenkins:lts
     user: root
     container_name: jenkins
