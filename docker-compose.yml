@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  dind:
+    image: docker:dind
+    user: root
+    privileged: true
+    container_name: dind
+    expose:
+      - 2375
+    networks:
+      - jenkins_dind
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    container_name: jenkins
+    depends_on:
+      - dind
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - ./jenkins:/var/jenkins_home # creates a bind mount where the jenkins-data directory on host maps to the Jenkins home directory inside the container.
+      - /usr/bin/docker:/usr/bin/docker # maps the Docker binary on the host system (/usr/bin/docker) to a path in a Docker container.
+      - /var/run/docker.sock:/var/run/docker.sock # Mount the Docker socket in a container, to manage or build images from another container
+    environment:
+      DOCKER_HOST: "tcp://dind:2375"
+    networks:
+      - jenkins_dind
+
+networks:
+  jenkins_dind:
+    driver: bridge
